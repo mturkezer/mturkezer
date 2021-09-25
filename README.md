@@ -2,7 +2,6 @@
 - 👀 I’m interested in optimization and machine learning applied in engineering applications. 
 - 🌱 I’m currently learning optimization and ML. 
 - 💞️ I’m looking to collaborate on these topics. 
-- 📫 Send me a DM if you want to collaborate. 
 
 <!---
 mturkezer/mturkezer is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
