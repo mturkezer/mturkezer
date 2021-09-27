@@ -8,10 +8,10 @@ import numpy as np
 
 class NativeSoil():
     def __init__(self, soil_input):
+        self.depth = soil_input['depth']
         self.elevation = (soil_input['top_elevation'],
                           soil_input['top_elevation'] - self.depth
                           )
-        self.depth = soil_input['depth']
         self.gamma_sat = soil_input['gamma_sat']
         self.gamma_dry = soil_input['gamma_dry']
 
@@ -47,14 +47,6 @@ class NonCompressibleSoil(NativeSoil):
         super().__init__(soil_input)
 
 
-
-
-
-
-
-
-
-
 class Embankment():
     def __init__(self, soil_input):
         self.gamma_sat = soil_input['gamma_sat']
@@ -82,27 +74,9 @@ class WickDrain():
         # self.pattern
 
 
-
-
-
-
-
-
-
-
-
-def vertical_stress():
-
-
-
-
-
-
-
-
-
 def main():
     clay_1_prop = {'gamma_sat': 19,
+                   'gamma_dry':18,
                    'depth': 40,
                    'Cc': 0.30,
                    'Cr': 1.15,
@@ -122,11 +96,7 @@ def main():
     cl1 = CompressibleSoil(clay_1_prop)
     preload = Embankment(preload_prop)
 
-    print(f"CLAY-1 height: {cl1.height}, Preload unit weight: {preload.gamma_sat}")
-
-
-
-
+    print(f"CLAY-1 depth: {cl1.depth}, Preload unit weight: {preload.gamma_sat}")
 
 
 print(f"__name__ value: {__name__}")
