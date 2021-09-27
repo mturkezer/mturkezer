@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 
 # TODO --- Terzaghi's 1D Consolidation Settlement Formulation
@@ -6,33 +6,51 @@ import numpy
 # inputs --> H, Cc, Sig_0, Sig_f
 # output --> s (mm)
 
-soil_1 = {'gamma_sat': 19,
-             'height': 40,
-             'Cc': 0.30,
-             'Cr': 1.15,
-             'e0': 1.15,
-             'OCR': 1,
-             'K': 0.0001,
-             'Kr': 0.0005
-}
-
 
 class CompressibleSoil():
     def __init__(self, soil_input):
         self.gamma_sat = soil_input['gamma_sat']
-        self.height = soil_input['height']
+        self.depth = soil_input['depth']
         self.Cc = soil_input['Cc']
         self.Cr = soil_input['Cr']
         self.e0 = soil_input['e0']
         self.OCR = soil_input['OCR']
         self.K = soil_input['K']
         self.Kr = soil_input['Kr']
+        self.elevation = (soil_input['top_elevation'],
+                          soil_input['top_elevation']- self.depth
+                         )
 
 
 class NonCompressibleSoil():
     def __init__(self, soil_input):
         self.gamma_sat = soil_input['gamma_sat']
         self.gamma_dry = soil_input['gamma_dry']
+        self.depth = soil_input['depth']
+        self.elevation = (soil_input['top_elevation'],
+                          soil_input['top_elevation'] - self.depth
+                          )
+
+
+    def vertical_stress(self, gwt_elv):
+        top_elv = self.elevation[0]
+        bottom_elv = self.elevation[1]
+
+        if gwt_elv >= top_elv:                                                      # Fully saturated layer.
+            ver_str = self.gamma_sat * self.depth
+
+        elif gwt_elv <= bottom_elv:
+            ver_str = self.gamma_dry * self.depth                                    # Completely dry layer.
+
+        elif gwt_elv in np.linspace(top_elv, bottom_elv, 201):                      # GWT in the middle. 5 cm interval
+            ver_str = self.gamma_dry * (top_elv - gwt_elv) + self.gamma_sat * (gwt_elv - bottom_elv)
+
+        return ver_str
+
+
+
+
+
 
 
 class Embankment():
@@ -60,7 +78,18 @@ class WickDrain():
         # self.install_stage
         # self.smear_zone
         # self.pattern
-        
+
+
+
+
+
+def soil_layer(soils):
+
+
+
+
+
+def vertical_stress():
 
 
 
@@ -68,26 +97,51 @@ class WickDrain():
 
 
 
-H = 5
-gamma_soil = 19
-gamma_fill = 20
-height_fill = 10
-Cc = 0.30
-p_0 = gamma * (H/2)
-pload = gamma_fill * height_fill
+
+
+def main():
+    clay_1_prop = {'gamma_sat': 19,
+                   'depth': 40,
+                   'Cc': 0.30,
+                   'Cr': 1.15,
+                   'e0': 1.15,
+                   'OCR': 1,
+                   'K': 0.0001,
+                   'Kr': 0.0005,
+                   'top_elevation': 0
+                   }
+
+    preload_prop = {'gamma_sat': 19,
+                    'height': 5,
+                    'gamma_dry': 18,
+                    'base_width': 200
+                    }
+
+    cl1 = CompressibleSoil(clay_1_prop)
+    preload = Embankment(preload_prop)
+
+    print(f"CLAY-1 height: {cl1.height}, Preload unit weight: {preload.gamma_sat}")
+
+
+
+
+
+
+print(f"__name__ value: {__name__}")
+if __name__ == '__main__':
+    main()
+
+#
+# H = 5
+# gamma_soil = 19
+# gamma_fill = 20
+# height_fill = 10
+# Cc = 0.30
+# p_0 = gamma * (H/2)
+# pload = gamma_fill * height_fill
 
 
 # TODO --- Time Rate of Consolidation
 
 
-
-
-
-
-
 # TODO --- Radial Consolidation and Preloading
-
-
-
-
-
