@@ -6,46 +6,48 @@ import numpy as np
 # inputs --> H, Cc, Sig_0, Sig_f
 # output --> s (mm)
 
-
-class CompressibleSoil():
+class NativeSoil():
     def __init__(self, soil_input):
-        self.gamma_sat = soil_input['gamma_sat']
+        self.elevation = (soil_input['top_elevation'],
+                          soil_input['top_elevation'] - self.depth
+                          )
         self.depth = soil_input['depth']
+        self.gamma_sat = soil_input['gamma_sat']
+        self.gamma_dry = soil_input['gamma_dry']
+
+    def vertical_stress(self, gwt_elv):
+        top_elv = self.elevation[0]
+        bottom_elv = self.elevation[1]
+
+        if gwt_elv >= top_elv:  # Fully saturated layer.
+            ver_str = self.gamma_sat * self.depth
+
+        elif gwt_elv <= bottom_elv:
+            ver_str = self.gamma_dry * self.depth  # Completely dry layer.
+
+        elif gwt_elv in np.linspace(top_elv, bottom_elv, 201):  # GWT in the middle. 5 cm interval
+            ver_str = self.gamma_dry * (top_elv - gwt_elv) + self.gamma_sat * (gwt_elv - bottom_elv)
+
+        return ver_str
+
+
+class CompressibleSoil(NativeSoil):
+    def __init__(self, soil_input):
+        super().__init__(soil_input)
         self.Cc = soil_input['Cc']
         self.Cr = soil_input['Cr']
         self.e0 = soil_input['e0']
         self.OCR = soil_input['OCR']
         self.K = soil_input['K']
         self.Kr = soil_input['Kr']
-        self.elevation = (soil_input['top_elevation'],
-                          soil_input['top_elevation']- self.depth
-                         )
 
 
-class NonCompressibleSoil():
+class NonCompressibleSoil(NativeSoil):
     def __init__(self, soil_input):
-        self.gamma_sat = soil_input['gamma_sat']
-        self.gamma_dry = soil_input['gamma_dry']
-        self.depth = soil_input['depth']
-        self.elevation = (soil_input['top_elevation'],
-                          soil_input['top_elevation'] - self.depth
-                          )
+        super().__init__(soil_input)
 
 
-    def vertical_stress(self, gwt_elv):
-        top_elv = self.elevation[0]
-        bottom_elv = self.elevation[1]
 
-        if gwt_elv >= top_elv:                                                      # Fully saturated layer.
-            ver_str = self.gamma_sat * self.depth
-
-        elif gwt_elv <= bottom_elv:
-            ver_str = self.gamma_dry * self.depth                                    # Completely dry layer.
-
-        elif gwt_elv in np.linspace(top_elv, bottom_elv, 201):                      # GWT in the middle. 5 cm interval
-            ver_str = self.gamma_dry * (top_elv - gwt_elv) + self.gamma_sat * (gwt_elv - bottom_elv)
-
-        return ver_str
 
 
 
@@ -83,7 +85,7 @@ class WickDrain():
 
 
 
-def soil_layer(soils):
+
 
 
 
